@@ -2,7 +2,35 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Card from "../components/Card";
+import { Line } from "react-chartjs-2";   // ✅ chart import
 import "../css/Dashboard.css";
+
+// ✅ Chart.js registration (must be inside Dashboard.js, no new file)
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+
+
+
+
 
 function Dashboard() {
   // State for dynamic hardware data
@@ -14,16 +42,15 @@ function Dashboard() {
     connectionStatus: "Connected",
   });
 
+  // Chart state
+  const [chartValues, setChartValues] = useState([200, 400, 600, 850, 300]);
+
   // Function to fetch dynamic data from backend API
   const fetchLiveData = async () => {
     try {
-      // ⚠️ REPLACE THIS URL with your backend server URL (e.g., http://localhost:5000/api/sensor)
       const response = await fetch("http://localhost:5000/api/sensor");
-      
-      if (!response.ok) {
-        throw new Error("Hardware server unreachable");
-      }
-      
+      if (!response.ok) throw new Error("Hardware server unreachable");
+
       const data = await response.json();
 
       setSensorData({
@@ -33,8 +60,13 @@ function Dashboard() {
         lastAlert: data.lastAlert || "None",
         connectionStatus: "Connected",
       });
+
+      // ✅ push new sensorValue into chart
+      setChartValues((prev) => {
+        const updated = [...prev.slice(-9), data.sensorValue];
+        return updated;
+      });
     } catch (error) {
-      // Fallback state if server/Arduino isn't sending data yet
       setSensorData((prev) => ({
         ...prev,
         connectionStatus: "Disconnected",
@@ -43,15 +75,37 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    fetchLiveData(); // Initial fetch
-
-    // Poll the backend every 1 second (1000 ms) for live hardware updates
+    fetchLiveData();
     const interval = setInterval(() => {
       fetchLiveData();
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
+
+  // Chart data + options
+  const chartData = {
+    labels: Array.from({ length: chartValues.length }, (_, i) => `T${i + 1}`),
+    datasets: [
+      {
+        label: "Sensor Reading",
+        data: chartValues,
+        borderColor: "#34d399",
+        backgroundColor: "rgba(52, 211, 153, 0.2)",
+        tension: 0.3,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: "#f8fafc" } },
+    },
+    scales: {
+      x: { ticks: { color: "#94a3b8" } },
+      y: { ticks: { color: "#94a3b8" } },
+    },
+  };
 
   return (
     <div className="dashboard-layout">
@@ -110,6 +164,10 @@ function Dashboard() {
               subtext="Recorded Trigger Event"
             />
           </div>
+
+          {/* ✅ Chart Section */}
+          <h2>Live Sensor Graph</h2>
+          <Line data={chartData} options={chartOptions} />
 
           {/* Live Activity Feed Box */}
           <div className="activity-banner">
