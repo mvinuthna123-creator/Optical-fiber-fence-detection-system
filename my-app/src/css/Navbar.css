@@ -1,0 +1,39 @@
+.navbar {
+  height: 65px;
+  background-color: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  color: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navbar h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.user {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #94a3b8;
+  background: #1e293b;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
