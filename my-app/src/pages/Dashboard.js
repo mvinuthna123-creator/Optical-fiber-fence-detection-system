@@ -5,7 +5,7 @@ import Card from "../components/Card";
 import { Line } from "react-chartjs-2";   // ✅ chart import
 import "../css/Dashboard.css";
 
-// ✅ Chart.js registration (must be inside Dashboard.js, no new file)
+// ✅ Chart.js registration
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -26,11 +26,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-
-
-
-
 
 function Dashboard() {
   // State for dynamic hardware data
@@ -53,10 +48,12 @@ function Dashboard() {
 
       const data = await response.json();
 
+      console.log("Fetched:",data);
+
       setSensorData({
         status: data.isIntrusion ? "INTRUSION DETECTED" : "SAFE",
         sensorValue: data.sensorValue,
-        isIntrusion: data.isIntrusion,
+        isIntrusion: data.isIntrusion || false,
         lastAlert: data.lastAlert || "None",
         connectionStatus: "Connected",
       });
