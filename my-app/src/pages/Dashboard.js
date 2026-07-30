@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Card from "../components/Card";
-import { Line } from "react-chartjs-2";   // ✅ chart import
+import { Line } from "react-chartjs-2";
 import "../css/Dashboard.css";
 
-// ✅ Chart.js registration
+// Chart.js registration
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -34,7 +34,7 @@ function Dashboard() {
     sensorValue: 0,
     isIntrusion: false,
     lastAlert: "None",
-    connectionStatus: "Connected",
+    connectionStatus: "Offline",
   });
 
   // Chart state
@@ -47,8 +47,7 @@ function Dashboard() {
       if (!response.ok) throw new Error("Hardware server unreachable");
 
       const data = await response.json();
-
-      console.log("Fetched:",data);
+      console.log("Fetched:", data);
 
       setSensorData({
         status: data.isIntrusion ? "INTRUSION DETECTED" : "SAFE",
@@ -58,7 +57,7 @@ function Dashboard() {
         connectionStatus: "Connected",
       });
 
-      // ✅ push new sensorValue into chart
+      // push new sensorValue into chart
       setChartValues((prev) => {
         const updated = [...prev.slice(-9), data.sensorValue];
         return updated;
@@ -73,9 +72,7 @@ function Dashboard() {
 
   useEffect(() => {
     fetchLiveData();
-    const interval = setInterval(() => {
-      fetchLiveData();
-    }, 1000);
+    const interval = setInterval(fetchLiveData, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -162,7 +159,7 @@ function Dashboard() {
             />
           </div>
 
-          {/* ✅ Chart Section */}
+          {/* Chart Section */}
           <h2>Live Sensor Graph</h2>
           <Line data={chartData} options={chartOptions} />
 
